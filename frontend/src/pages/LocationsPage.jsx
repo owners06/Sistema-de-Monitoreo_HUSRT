@@ -3,16 +3,17 @@ import { getLocations, createLocation, updateLocation, deleteLocation } from '..
 
 const columns = [
   { key: 'name', label: 'Nombre' },
-  { key: 'floor', label: 'Piso/Área' },
   { key: 'building', label: 'Edificio' },
-  { key: 'capacity', label: 'Capacidad' },
+  { key: 'floor', label: 'Piso' },
+  { key: 'room', label: 'Habitación/Sala' },
 ]
 
 const fields = [
   { key: 'name', label: 'Nombre de la ubicación', required: true, placeholder: 'ej: UCI Pediátrica' },
-  { key: 'floor', label: 'Piso / Área', placeholder: 'ej: Piso 3, Ala Norte' },
   { key: 'building', label: 'Edificio', placeholder: 'ej: Torre A' },
-  { key: 'capacity', label: 'Capacidad (camas/puestos)', type: 'number', placeholder: '20' },
+  { key: 'floor', label: 'Piso', placeholder: 'ej: Piso 3' },
+  { key: 'room', label: 'Habitación / Sala', placeholder: 'ej: Sala 302' },
+  { key: 'description', label: 'Descripción', placeholder: 'Opcional' },
 ]
 
 export default function LocationsPage() {

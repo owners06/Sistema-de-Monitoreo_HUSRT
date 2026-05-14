@@ -56,11 +56,16 @@ export default function CrudPage({ title, subtitle, icon, fetchFn, createFn, upd
     e.preventDefault()
     setSaving(true)
     try {
+      const cleanForm = {}
+      for (const key in form) {
+        cleanForm[key] = form[key] === '' ? null : form[key]
+      }
+      
       if (modal === 'create') {
-        await createFn(form)
+        await createFn(cleanForm)
         toast('Registro creado exitosamente', 'success')
       } else {
-        await updateFn(selected.id, form)
+        await updateFn(selected.id, cleanForm)
         toast('Registro actualizado', 'success')
       }
       closeModal()

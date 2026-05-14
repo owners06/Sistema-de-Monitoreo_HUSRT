@@ -2,23 +2,15 @@ import CrudPage from '../components/CrudPage'
 import { getUsers, createUser, updateUser, deleteUser } from '../api'
 
 const columns = [
-  { key: 'username', label: 'Usuario' },
-  { key: 'email', label: 'Correo' },
+  { key: 'name', label: 'Nombre' },
   { key: 'document', label: 'Documento' },
-  { key: 'role', label: 'Rol', render: (v) => v ? <span className="badge badge-info">{v}</span> : <span className="td-muted">—</span> },
+  { key: 'phone', label: 'Teléfono' },
 ]
 
 const fields = [
-  { key: 'username', label: 'Nombre de usuario', required: true, placeholder: 'ej: juan.perez' },
-  { key: 'email', label: 'Correo electrónico', type: 'email', required: true, placeholder: 'correo@hospital.com' },
-  { key: 'document', label: 'Documento', placeholder: 'Número de identificación' },
-  { key: 'password', label: 'Contraseña', type: 'password', placeholder: '••••••••' },
-  { key: 'role', label: 'Rol', type: 'select', options: [
-    { value: 'admin', label: 'Administrador' },
-    { value: 'medico', label: 'Médico' },
-    { value: 'enfermero', label: 'Enfermero' },
-    { value: 'tecnico', label: 'Técnico' },
-  ]},
+  { key: 'name', label: 'Nombre completo', required: true, placeholder: 'ej: Juan Pérez' },
+  { key: 'document', label: 'Documento', required: true, placeholder: 'Número de identificación' },
+  { key: 'phone', label: 'Teléfono', required: true, placeholder: 'ej: 3001234567' },
 ]
 
 export default function UsersPage() {
