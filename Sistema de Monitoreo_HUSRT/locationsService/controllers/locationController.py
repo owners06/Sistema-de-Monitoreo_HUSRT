@@ -2,15 +2,18 @@ from flask import request, jsonify
 from models.locationModel import Location
 from extensions import db
 
+
 def get_locations():
     locations = Location.query.all()
     return jsonify([l.to_dict() for l in locations]), 200
 
+
 def get_location(location_id):
     location = Location.query.get(location_id)
     if not location:
-        return jsonify({"error": "Ubicación no encontrada"}), 404
+        return jsonify({"error": "Ubicacion no encontrada"}), 404
     return jsonify(location.to_dict()), 200
+
 
 def create_location():
     data = request.get_json()
@@ -26,12 +29,13 @@ def create_location():
     )
     db.session.add(location)
     db.session.commit()
-    return jsonify({"message": "Ubicación creada", "location": location.to_dict()}), 201
+    return jsonify({"message": "Ubicacion creada", "location": location.to_dict()}), 201
+
 
 def update_location(location_id):
     location = Location.query.get(location_id)
     if not location:
-        return jsonify({"error": "Ubicación no encontrada"}), 404
+        return jsonify({"error": "Ubicacion no encontrada"}), 404
     data = request.get_json()
     location.name = data.get("name", location.name)
     location.building = data.get("building", location.building)
@@ -39,12 +43,13 @@ def update_location(location_id):
     location.room = data.get("room", location.room)
     location.description = data.get("description", location.description)
     db.session.commit()
-    return jsonify({"message": "Ubicación actualizada", "location": location.to_dict()}), 200
+    return jsonify({"message": "Ubicacion actualizada", "location": location.to_dict()}), 200
+
 
 def delete_location(location_id):
     location = Location.query.get(location_id)
     if not location:
-        return jsonify({"error": "Ubicación no encontrada"}), 404
+        return jsonify({"error": "Ubicacion no encontrada"}), 404
     db.session.delete(location)
     db.session.commit()
-    return jsonify({"message": "Ubicación eliminada"}), 200
+    return jsonify({"message": "Ubicacion eliminada"}), 200

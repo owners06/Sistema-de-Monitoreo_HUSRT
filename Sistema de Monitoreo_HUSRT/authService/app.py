@@ -10,12 +10,11 @@ def create_app():
     app.json.sort_keys = False
     db.init_app(app)
     app.register_blueprint(auth_bp, url_prefix="/auth")
-    
     return app
+
 
 if __name__ == "__main__":
     app = create_app()
     with app.app_context():
         db.create_all()
-    # app.run(debug=True, port=5003)
-    app.run(host="0.0.0.0", port=5003, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=True)

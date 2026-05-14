@@ -1,7 +1,7 @@
 from flask import Flask
 from config import Config
 from extensions import db
-from usersService.routes.userRoute import user_bp
+from routes.userRoute import user_bp
 
 
 def create_app():
@@ -10,7 +10,6 @@ def create_app():
     app.json.sort_keys = False
     db.init_app(app)
     app.register_blueprint(user_bp)
-
     return app
 
 

@@ -4,6 +4,7 @@ from controllers.locationController import (
 )
 
 locations_bp = Blueprint("locations", __name__)
+
 locations_bp.route("/", methods=["GET"])(get_locations)
 locations_bp.route("/<int:location_id>", methods=["GET"])(get_location)
 locations_bp.route("/", methods=["POST"])(create_location)

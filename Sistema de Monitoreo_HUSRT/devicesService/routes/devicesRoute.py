@@ -1,5 +1,8 @@
 from flask import Blueprint, request, jsonify
-from controllers.devicesController import *
+from controllers.devicesController import (
+    get_all_devices, get_device_by_id,
+    create_device, update_device, delete_device
+)
 
 device_bp = Blueprint('device_bp', __name__)
 
@@ -19,10 +22,8 @@ def get_device_by_id_route(device_id):
 @device_bp.route('/devices', methods=['POST'])
 def create_device_route():
     data = request.get_json()
-
     if not data:
         return jsonify({"message": "JSON Data is required"}), 400
-
     result, status = create_device(data)
     return jsonify(result), status
 
@@ -30,10 +31,8 @@ def create_device_route():
 @device_bp.route('/devices/<int:device_id>', methods=['PUT'])
 def update_device_route(device_id):
     data = request.get_json()
-
     if not data:
         return jsonify({"message": "JSON Data is required"}), 400
-
     result, status = update_device(device_id, data)
     return jsonify(result), status
 

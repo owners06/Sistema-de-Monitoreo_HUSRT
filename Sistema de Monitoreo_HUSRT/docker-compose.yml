@@ -1,0 +1,89 @@
+services:
+
+  db:
+    image: postgres:15
+    container_name: hospital_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "0000"
+      POSTGRES_DB: hospital_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  auth-service:
+    build: ./authService
+    container_name: auth-service
+    ports:
+      - "5001:5001"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  users-service:
+    build: ./usersService
+    container_name: users-service
+    ports:
+      - "5002:5002"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  devices-service:
+    build: ./devicesService
+    container_name: devices-service
+    ports:
+      - "5003:5003"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  locations-service:
+    build: ./locationsService
+    container_name: locations-service
+    ports:
+      - "5004:5004"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  metrics-service:
+    build: ./metricsService
+    container_name: metrics-service
+    ports:
+      - "5005:5005"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  alerts-service:
+    build: ./alertsService
+    container_name: alerts-service
+    ports:
+      - "5006:5006"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  gateway:
+    build: ./gateway
+    container_name: gateway
+    ports:
+      - "5000:5000"
+    depends_on:
+      - auth-service
+      - users-service
+      - devices-service
+      - locations-service
+      - metrics-service
+      - alerts-service
+
+volumes:
+  postgres_data:

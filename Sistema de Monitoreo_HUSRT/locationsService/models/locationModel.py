@@ -1,5 +1,6 @@
 from extensions import db
 
+
 class Location(db.Model):
     __tablename__ = "locations"
 
@@ -10,3 +11,12 @@ class Location(db.Model):
     room = db.Column(db.String(50), nullable=True)
     description = db.Column(db.String(255), nullable=True)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "building": self.building,
+            "floor": self.floor,
+            "room": self.room,
+            "description": self.description
+        }

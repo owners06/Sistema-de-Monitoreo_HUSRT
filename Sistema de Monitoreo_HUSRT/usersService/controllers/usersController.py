@@ -4,25 +4,20 @@ from extensions import db
 
 def get_all_users():
     users = User.query.order_by(User.id.asc()).all()
-
     return [serialize_user(user) for user in users], 200
 
 
 def get_user_by_document(user_document):
     user = User.query.filter_by(document=user_document).first()
-
     if not user:
         return {"message": "User not found"}, 404
-
     return serialize_user(user), 200
 
 
 def get_user_by_id(user_id):
     user = User.query.get(user_id)
-
     if not user:
         return {"message": "User not found"}, 404
-
     return serialize_user(user), 200
 
 
@@ -47,7 +42,6 @@ def create_user(data):
 
 def update_user(user_id, data):
     user = User.query.get(user_id)
-
     if not user:
         return {"message": "User not found"}, 404
 
@@ -73,7 +67,6 @@ def update_user(user_id, data):
 
 def delete_user(user_id):
     user = User.query.get(user_id)
-
     if not user:
         return {"message": "User not found"}, 404
 

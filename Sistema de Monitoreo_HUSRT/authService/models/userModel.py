@@ -1,5 +1,13 @@
 from extensions import db
 
+
+class Role(db.Model):
+    __tablename__ = "roles"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+
+
 class User(db.Model):
     __tablename__ = "users"
 
@@ -7,10 +15,3 @@ class User(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=True)
-
-
-class Role(db.Model):
-    __tablename__ = "roles"
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)

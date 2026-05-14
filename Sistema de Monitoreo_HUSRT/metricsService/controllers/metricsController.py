@@ -4,44 +4,25 @@ from extensions import db
 
 def get_all_metrics():
     metrics = Metric.query.order_by(Metric.id.asc()).all()
-
     return [serialize_metric(metric) for metric in metrics], 200
 
 
 def get_metric_by_id(metric_id):
     metric = Metric.query.get(metric_id)
-
     if not metric:
         return {"message": "Metric not found"}, 404
-
     return serialize_metric(metric), 200
-
-
-def get_metric_by_id(metric_id):
-    metric = Metric.query.get(metric_id)
-
-    if not metric:
-        return {"message": "Metric not found"}, 404
-
-    return serialize_metric(metric), 200
-
-def serialize_metric(metric):
-    return {
-        "id": metric.id,
-        "name": metric.name,
-        "value": metric.value,
-        "timestamp": metric.timestamp
-    }
 
 
 def create_metric(data):
-    if Metric.query.filter_by(name=data["name"]).first():
-        return {"message": "Metric already exists"}, 409
+    from datetime import datetime
 
     new_metric = Metric(
         name=data["name"],
         value=data["value"],
-        timestamp=data["timestamp"]
+        timestamp=datetime.fromisoformat(data["timestamp"]) if isinstance(data["timestamp"], str) else data["timestamp"],
+        device_id=data.get("device_id"),
+        metric_type_id=data.get("metric_type_id")
     )
 
     db.session.add(new_metric)
@@ -54,22 +35,18 @@ def create_metric(data):
 
 
 def update_metric(metric_id, data):
-    metric = Metric.query.get(metric_id)
+    from datetime import datetime
 
+    metric = Metric.query.get(metric_id)
     if not metric:
         return {"message": "Metric not found"}, 404
 
-    existing_metric = Metric.query.filter(
-        Metric.id != metric_id,
-        Metric.name == data["name"]
-    ).first()
-
-    if existing_metric:
-        return {"message": "Metric already exists"}, 409
-
-    metric.name = data["name"]
-    metric.value = data["value"]
-    metric.timestamp = data["timestamp"]
+    metric.name = data.get("name", metric.name)
+    metric.value = data.get("value", metric.value)
+    if "timestamp" in data:
+        metric.timestamp = datetime.fromisoformat(data["timestamp"]) if isinstance(data["timestamp"], str) else data["timestamp"]
+    metric.device_id = data.get("device_id", metric.device_id)
+    metric.metric_type_id = data.get("metric_type_id", metric.metric_type_id)
 
     db.session.commit()
 
@@ -81,7 +58,6 @@ def update_metric(metric_id, data):
 
 def delete_metric(metric_id):
     metric = Metric.query.get(metric_id)
-
     if not metric:
         return {"message": "Metric not found"}, 404
 
@@ -96,5 +72,7 @@ def serialize_metric(metric):
         "id": metric.id,
         "name": metric.name,
         "value": metric.value,
-        "timestamp": metric.timestamp
+        "timestamp": metric.timestamp.isoformat() if metric.timestamp else None,
+        "device_id": metric.device_id,
+        "metric_type_id": metric.metric_type_id
     }
