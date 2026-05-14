@@ -18,7 +18,7 @@ export default function LoginPage({ onLogin }) {
     if (!loginForm.password) return setErrors({ password: 'Requerido' })
     setLoading(true)
     try {
-      const { data } = await login({ username: loginForm.username, password: loginForm.password })
+      const { data } = await login({ email: loginForm.username, password: loginForm.password })
       localStorage.setItem('token', data.token || data.access_token)
       localStorage.setItem('user', loginForm.username)
       toast('Sesión iniciada correctamente', 'success')
@@ -70,12 +70,12 @@ export default function LoginPage({ onLogin }) {
         {tab === 'login' ? (
           <form onSubmit={handleLogin}>
             <div className="form-group">
-              <label className="form-label">Usuario</label>
+              <label className="form-label">Correo electrónico</label>
               <input
                 id="login-username"
                 className="form-input"
                 type="text"
-                placeholder="Tu nombre de usuario"
+                placeholder="correo@hospital.com"
                 value={loginForm.username}
                 onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
               />
