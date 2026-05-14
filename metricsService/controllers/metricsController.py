@@ -16,22 +16,26 @@ def get_metric_by_id(metric_id):
 
 def create_metric(data):
     from datetime import datetime
+    try:
+        new_metric = Metric(
+            name=data.get("name"),
+            value=float(data.get("value")) if data.get("value") is not None else 0.0,
+            timestamp=datetime.fromisoformat(str(data.get("timestamp"))) if data.get("timestamp") else datetime.utcnow(),
+            device_id=int(data.get("device_id")) if data.get("device_id") is not None else None,
+            metric_type_id=int(data.get("metric_type_id")) if data.get("metric_type_id") is not None else None
+        )
 
-    new_metric = Metric(
-        name=data["name"],
-        value=data["value"],
-        timestamp=datetime.fromisoformat(data["timestamp"]) if isinstance(data["timestamp"], str) else data["timestamp"],
-        device_id=data.get("device_id"),
-        metric_type_id=data.get("metric_type_id")
-    )
+        db.session.add(new_metric)
+        db.session.commit()
 
-    db.session.add(new_metric)
-    db.session.commit()
-
-    return {
-        "message": "Metric created successfully",
-        "data": serialize_metric(new_metric)
-    }, 201
+        return {
+            "message": "Metric created successfully",
+            "data": serialize_metric(new_metric)
+        }, 201
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {"message": f"Error interno: {str(e)}"}, 500
 
 
 def update_metric(metric_id, data):

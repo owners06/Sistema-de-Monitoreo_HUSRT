@@ -15,23 +15,28 @@ def get_device_by_id(device_id):
 
 
 def create_device(data):
-    if Device.query.filter_by(name=data["name"]).first():
-        return {"message": "Device already exists"}, 409
+    try:
+        if Device.query.filter_by(name=data.get("name")).first():
+            return {"message": "Device already exists"}, 409
 
-    new_device = Device(
-        name=data["name"],
-        model=data["model"],
-        location_id=data["location_id"],
-        device_type_id=data.get("device_type_id")
-    )
+        new_device = Device(
+            name=data.get("name"),
+            model=data.get("model"),
+            location_id=int(data.get("location_id")) if data.get("location_id") is not None else 1,
+            device_type_id=int(data.get("device_type_id")) if data.get("device_type_id") is not None else None
+        )
 
-    db.session.add(new_device)
-    db.session.commit()
+        db.session.add(new_device)
+        db.session.commit()
 
-    return {
-        "message": "Device created successfully",
-        "data": serialize_device(new_device)
-    }, 201
+        return {
+            "message": "Device created successfully",
+            "data": serialize_device(new_device)
+        }, 201
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {"message": f"Error interno en Dispositivos: {str(e)}"}, 500
 
 
 def update_device(device_id, data):
