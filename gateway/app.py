@@ -6,12 +6,12 @@ import jwt
 app = Flask(__name__)
 
 # DOCKER (produccion)
-AUTH_SERVICE    = "http://authService:5001/auth"
-USER_SERVICE    = "http://usersService:5002"
-DEVICE_SERVICE  = "http://devicesService:5003"
-LOCATION_SERVICE = "http://locationsService:5004/locations"
-METRIC_SERVICE  = "http://metricsService:5005"
-ALERT_SERVICE   = "http://alertsService:5006"
+AUTH_SERVICE    = "http://auth-service:5001/auth"
+USER_SERVICE    = "http://users-service:5002"
+DEVICE_SERVICE  = "http://devices-service:5003"
+LOCATION_SERVICE = "http://locations-service:5004/locations"
+METRIC_SERVICE  = "http://metrics-service:5005"
+ALERT_SERVICE   = "http://alerts-service:5006"
 
 # LOCAL (desarrollo) - descomentar y comentar el bloque de arriba
 # AUTH_SERVICE    = "http://localhost:5001/auth"
