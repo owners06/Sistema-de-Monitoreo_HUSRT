@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import requests
 from functools import wraps
 import jwt
 
 app = Flask(__name__)
+CORS(app) # Habilita CORS para todas las rutas
 
 # DOCKER (produccion)
 AUTH_SERVICE    = "http://auth-service:5001/auth"
@@ -50,8 +52,14 @@ def token_required(f):
 
 @app.route('/auth/register', methods=['POST'])
 def register():
-    response = requests.post(f"{AUTH_SERVICE}/register", json=request.json)
-    return jsonify(response.json()), response.status_code
+    try:
+        response = requests.post(f"{AUTH_SERVICE}/register", json=request.json)
+        return jsonify(response.json()), response.status_code
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Gateway Error: {str(e)}"}), 500
+
 
 
 @app.route('/auth/login', methods=['POST'])
