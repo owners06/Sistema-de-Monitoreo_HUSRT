@@ -31,6 +31,9 @@ app.json.sort_keys = False
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
+        if request.method == "OPTIONS":
+            return jsonify({}), 200
+            
         auth_header = request.headers.get("Authorization")
         if not auth_header:
             return jsonify({"error": "Token required"}), 401
@@ -46,6 +49,13 @@ def token_required(f):
             return jsonify({"error": "Error on token"}), 401
         return f(*args, **kwargs)
     return decorated
+
+
+@app.errorhandler(Exception)
+def handle_global_error(e):
+    import traceback
+    traceback.print_exc()
+    return jsonify({"error": f"Gateway Error: {str(e)}"}), 500
 
 
 # ── AUTH ──────────────────────────────────────────────────────────────────────
