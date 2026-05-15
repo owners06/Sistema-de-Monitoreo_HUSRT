@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { login, register } from '../api'
+import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 
-export default function LoginPage({ onLogin }) {
+export default function LoginPage() {
   const [tab, setTab] = useState('login')
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
   const toast = useToast()
+  const { login: authLogin } = useAuth()
 
   const [loginForm, setLoginForm] = useState({ username: '', password: '' })
   const [registerForm, setRegisterForm] = useState({ username: '', email: '', password: '', confirmPassword: '' })
@@ -19,12 +21,13 @@ export default function LoginPage({ onLogin }) {
     setLoading(true)
     try {
       const { data } = await login({ email: loginForm.username, password: loginForm.password })
-      localStorage.setItem('token', data.token || data.access_token)
-      localStorage.setItem('user', loginForm.username)
+      const token = data.token || data.access_token
+      authLogin(token, data.user)
       toast('Sesión iniciada correctamente', 'success')
-      onLogin()
     } catch (err) {
-      toast(err.response?.data?.error || 'Credenciales inválidas', 'error')
+      const msg = err.response?.data?.error || 'Credenciales inválidas'
+      setErrors({ login: msg })
+      toast(msg, 'error')
     } finally {
       setLoading(false)
     }
@@ -41,7 +44,9 @@ export default function LoginPage({ onLogin }) {
       toast('Cuenta creada. Ahora puedes iniciar sesión.', 'success')
       setTab('login')
     } catch (err) {
-      toast(err.response?.data?.error || 'Error al registrar', 'error')
+      const msg = err.response?.data?.error || 'Error al registrar'
+      setErrors({ register: msg })
+      toast(msg, 'error')
     } finally {
       setLoading(false)
     }
@@ -96,6 +101,22 @@ export default function LoginPage({ onLogin }) {
             <button id="btn-login" className="btn btn-primary" type="submit" style={{ width: '100%', justifyContent: 'center', marginTop: 8 }} disabled={loading}>
               {loading ? <span className="spinner" /> : '→'} {loading ? 'Ingresando...' : 'Ingresar al Sistema'}
             </button>
+
+            {errors.login && (
+              <div className="login-error-message" style={{ 
+                marginTop: '16px', 
+                padding: '10px', 
+                background: 'rgba(239, 68, 68, 0.1)', 
+                border: '1px solid var(--danger)', 
+                borderRadius: 'var(--radius-sm)',
+                color: 'var(--danger)',
+                fontSize: '13px',
+                textAlign: 'center'
+              }}>
+                ✕ {errors.login}
+              </div>
+            )}
+
           </form>
         ) : (
           <form onSubmit={handleRegister}>
@@ -118,9 +139,30 @@ export default function LoginPage({ onLogin }) {
                 {errors.confirmPassword && <p className="form-error">{errors.confirmPassword}</p>}
               </div>
             </div>
+
+            <div className="register-info-banner">
+              <span>ℹ️</span>
+              <p>Al registrarte obtendrás el rol de <strong>Visor</strong> (solo métricas). Puedes solicitar un rol más avanzado una vez dentro del sistema.</p>
+            </div>
+
             <button id="btn-register" className="btn btn-primary" type="submit" style={{ width: '100%', justifyContent: 'center', marginTop: 8 }} disabled={loading}>
               {loading ? <span className="spinner" /> : '+'} {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
             </button>
+
+            {errors.register && (
+              <div className="login-error-message" style={{ 
+                marginTop: '16px', 
+                padding: '10px', 
+                background: 'rgba(239, 68, 68, 0.1)', 
+                border: '1px solid var(--danger)', 
+                borderRadius: 'var(--radius-sm)',
+                color: 'var(--danger)',
+                fontSize: '13px',
+                textAlign: 'center'
+              }}>
+                ✕ {errors.register}
+              </div>
+            )}
           </form>
         )}
       </div>

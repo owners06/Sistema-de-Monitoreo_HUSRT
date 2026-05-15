@@ -1,25 +1,52 @@
-import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-
-const nav = [
-  { to: '/', label: 'Dashboard', icon: '🏠', exact: true },
-  { label: 'GESTIÓN', type: 'section' },
-  { to: '/users', label: 'Usuarios', icon: '👤' },
-  { to: '/devices', label: 'Dispositivos', icon: '📡' },
-  { to: '/locations', label: 'Ubicaciones', icon: '📍' },
-  { label: 'MONITOREO', type: 'section' },
-  { to: '/metrics', label: 'Métricas', icon: '📊' },
-  { to: '/alerts', label: 'Alertas', icon: '🚨' },
-]
+import { useAuth } from '../context/AuthContext'
 
 export default function Sidebar() {
   const navigate = useNavigate()
-  const username = localStorage.getItem('user') || 'Usuario'
+  const { user, isAdmin, hasAccess, getRoleName, logout } = useAuth()
+  const username = user?.username || localStorage.getItem('user') || 'Usuario'
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    logout()
     navigate('/login')
+  }
+
+  // Construir navegación dinámica según el rol
+  const nav = []
+
+  // Dashboard siempre visible
+  nav.push({ to: '/', label: 'Dashboard', icon: '🏠', exact: true })
+
+  // Sección GESTIÓN — solo admin y operator
+  if (hasAccess('operator')) {
+    nav.push({ label: 'GESTIÓN', type: 'section' })
+
+    if (isAdmin) {
+      nav.push({ to: '/users', label: 'Usuarios', icon: '👤' })
+    }
+    nav.push({ to: '/devices', label: 'Dispositivos', icon: '📡' })
+    nav.push({ to: '/locations', label: 'Ubicaciones', icon: '📍' })
+  }
+
+  // Sección MONITOREO — siempre visible (viewer ve métricas solo lectura)
+  nav.push({ label: 'MONITOREO', type: 'section' })
+  nav.push({ to: '/metrics', label: 'Métricas', icon: '📊' })
+
+  if (hasAccess('operator')) {
+    nav.push({ to: '/alerts', label: 'Alertas', icon: '🚨' })
+  }
+
+  // Sección ADMINISTRACIÓN — solo admin
+  if (isAdmin) {
+    nav.push({ label: 'ADMINISTRACIÓN', type: 'section' })
+    nav.push({ to: '/admin/users', label: 'Gestión de Cuentas', icon: '🔐' })
+    nav.push({ to: '/admin/role-requests', label: 'Solicitudes de Rol', icon: '📋' })
+  }
+
+  // Solicitar rol — visible para viewer y operator (no admin)
+  if (!isAdmin) {
+    nav.push({ label: 'MI CUENTA', type: 'section' })
+    nav.push({ to: '/request-role', label: 'Solicitar Rol', icon: '📤' })
   }
 
   return (
@@ -39,7 +66,7 @@ export default function Sidebar() {
             key={item.to}
             to={item.to}
             end={item.exact}
-            id={`nav-${item.label.toLowerCase()}`}
+            id={`nav-${item.label.toLowerCase().replace(/\s/g, '-')}`}
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >
             <span>{item.icon}</span>
@@ -53,7 +80,9 @@ export default function Sidebar() {
           <div className="user-avatar">{username[0]?.toUpperCase()}</div>
           <div className="user-info">
             <p>{username}</p>
-            <span>Sesión activa</span>
+            <span className={`role-badge-small role-${user?.role || 'viewer'}`}>
+              {getRoleName(user?.role || 'viewer')}
+            </span>
           </div>
           <button id="btn-logout" className="logout-btn" title="Cerrar sesión" onClick={handleLogout}>⏻</button>
         </div>

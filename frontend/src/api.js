@@ -18,7 +18,8 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Si es 401 y NO estamos en la página de login, redirigimos
+    if (error.response?.status === 401 && window.location.pathname !== '/login') {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       window.location.href = '/login'
@@ -30,6 +31,19 @@ api.interceptors.response.use(
 // ─── AUTH ────────────────────────────────────────────────────────────
 export const login = (data) => api.post('/auth/login', data)
 export const register = (data) => api.post('/auth/register', data)
+export const getMe = () => api.get('/auth/me')
+
+// ─── AUTH USERS (admin) ──────────────────────────────────────────────
+export const getAuthUsers = () => api.get('/auth/users')
+export const updateAuthUserRole = (id, data) => api.put(`/auth/users/${id}/role`, data)
+export const deleteAuthUser = (id) => api.delete(`/auth/users/${id}`)
+
+// ─── ROLE REQUESTS ───────────────────────────────────────────────────
+export const createRoleRequest = (data) => api.post('/auth/role-requests', data)
+export const getRoleRequests = () => api.get('/auth/role-requests')
+export const getMyRoleRequests = () => api.get('/auth/role-requests/mine')
+export const approveRoleRequest = (id) => api.put(`/auth/role-requests/${id}/approve`)
+export const rejectRoleRequest = (id) => api.put(`/auth/role-requests/${id}/reject`)
 
 // ─── USERS ───────────────────────────────────────────────────────────
 export const getUsers = () => api.get('/users')

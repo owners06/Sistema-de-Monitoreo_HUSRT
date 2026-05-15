@@ -1,5 +1,7 @@
 import CrudPage from '../components/CrudPage'
 import { getMetrics, createMetric, updateMetric, deleteMetric } from '../api'
+import { useAuth } from '../context/AuthContext'
+import MetricsReadOnlyPage from './MetricsReadOnlyPage'
 
 const columns = [
   { key: 'device_id', label: 'Dispositivo ID', render: (v) => <span className="badge badge-info">ID: {v || '—'}</span> },
@@ -16,6 +18,13 @@ const fields = [
 ]
 
 export default function MetricsPage() {
+  const { hasAccess } = useAuth()
+
+  // Viewer solo ve métricas en modo lectura (sin CRUD)
+  if (!hasAccess('operator')) {
+    return <MetricsReadOnlyPage />
+  }
+
   return (
     <CrudPage
       title="Métricas"
