@@ -51,6 +51,34 @@ def token_required(f):
     return decorated
 
 
+def admin_required(f):
+    """Decorator que requiere token + rol admin."""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if request.method == "OPTIONS":
+            return jsonify({}), 200
+
+        auth_header = request.headers.get("Authorization")
+        if not auth_header:
+            return jsonify({"error": "Token required"}), 401
+        try:
+            token = auth_header.split()[1]
+            decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            request.user = decoded_token
+        except jwt.ExpiredSignatureError:
+            return jsonify({"error": "Token has expired"}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({"error": "Token is invalid"}), 401
+        except Exception:
+            return jsonify({"error": "Error on token"}), 401
+
+        if decoded_token.get("role") != "admin":
+            return jsonify({"error": "Acceso denegado. Se requiere rol de administrador."}), 403
+
+        return f(*args, **kwargs)
+    return decorated
+
+
 @app.errorhandler(Exception)
 def handle_global_error(e):
     import traceback
@@ -75,6 +103,82 @@ def register():
 @app.route('/auth/login', methods=['POST'])
 def login():
     response = requests.post(f"{AUTH_SERVICE}/login", json=request.json)
+    return jsonify(response.json()), response.status_code
+
+
+@app.route('/auth/me', methods=['GET'])
+@token_required
+def get_me():
+    """Retorna los datos del usuario actual a partir del token JWT."""
+    user_data = {
+        "user_id": request.user.get("user_id"),
+        "email": request.user.get("email"),
+        "username": request.user.get("username"),
+        "role": request.user.get("role", "viewer")
+    }
+    return jsonify(user_data), 200
+
+
+# ── AUTH USERS (admin) ────────────────────────────────────────────────────────
+
+@app.route('/auth/users', methods=['GET'])
+@admin_required
+def get_auth_users():
+    response = requests.get(f"{AUTH_SERVICE}/users")
+    return jsonify(response.json()), response.status_code
+
+
+@app.route('/auth/users/<int:user_id>/role', methods=['PUT'])
+@admin_required
+def update_auth_user_role(user_id):
+    response = requests.put(f"{AUTH_SERVICE}/users/{user_id}/role", json=request.json)
+    return jsonify(response.json()), response.status_code
+
+
+@app.route('/auth/users/<int:user_id>', methods=['DELETE'])
+@admin_required
+def delete_auth_user(user_id):
+    response = requests.delete(f"{AUTH_SERVICE}/users/{user_id}")
+    return jsonify(response.json()), response.status_code
+
+
+# ── ROLE REQUESTS ─────────────────────────────────────────────────────────────
+
+@app.route('/auth/role-requests', methods=['POST'])
+@token_required
+def create_role_request():
+    data = request.json or {}
+    data["user_id"] = request.user.get("user_id")
+    response = requests.post(f"{AUTH_SERVICE}/role-requests", json=data)
+    return jsonify(response.json()), response.status_code
+
+
+@app.route('/auth/role-requests', methods=['GET'])
+@admin_required
+def get_all_role_requests():
+    response = requests.get(f"{AUTH_SERVICE}/role-requests")
+    return jsonify(response.json()), response.status_code
+
+
+@app.route('/auth/role-requests/mine', methods=['GET'])
+@token_required
+def get_my_role_requests():
+    user_id = request.user.get("user_id")
+    response = requests.get(f"{AUTH_SERVICE}/role-requests/user/{user_id}")
+    return jsonify(response.json()), response.status_code
+
+
+@app.route('/auth/role-requests/<int:request_id>/approve', methods=['PUT'])
+@admin_required
+def approve_role_request(request_id):
+    response = requests.put(f"{AUTH_SERVICE}/role-requests/{request_id}/approve")
+    return jsonify(response.json()), response.status_code
+
+
+@app.route('/auth/role-requests/<int:request_id>/reject', methods=['PUT'])
+@admin_required
+def reject_role_request(request_id):
+    response = requests.put(f"{AUTH_SERVICE}/role-requests/{request_id}/reject")
     return jsonify(response.json()), response.status_code
 
 
