@@ -13,17 +13,17 @@ Una plataforma robusta y escalable diseñada para el monitoreo en tiempo real de
 
 El proyecto está compuesto por 8 microservicios orquestados con **Docker Compose**:
 
-| Servicio | Responsabilidad |
-| :--- | :--- |
-| **`gateway`** | Punto de entrada único. Gestiona la seguridad y el ruteo. |
-| **`auth-service`** | Gestión de usuarios, sesiones JWT y sistema de roles. |
-| **`frontend`** | Interfaz de usuario moderna construida con React y Vite. |
-| **`users-service`** | Gestión de perfiles y personal médico. |
-| **`devices-service`** | Control de inventario de dispositivos hospitalarios. |
-| **`locations-service`** | Gestión de sedes, pisos y salas del hospital. |
-| **`metrics-service`** | Procesamiento de datos y estadísticas en tiempo real. |
-| **`alerts-service`** | Sistema de notificaciones y gestión de estados críticos. |
-| **`db`** | Base de datos centralizada PostgreSQL 15. |
+| Servicio | Responsabilidad | Ubicación |
+| :--- | :--- | :--- |
+| **`gateway`** | Punto de entrada único. Gestiona la seguridad y el ruteo. | `apps/gateway` |
+| **`auth-service`** | Gestión de usuarios, sesiones JWT y sistema de roles. | `services/auth-service` |
+| **`frontend`** | Interfaz de usuario moderna construida con React y Vite. | `apps/frontend` |
+| **`users-service`** | Gestión de perfiles y personal médico. | `services/users-service` |
+| **`devices-service`** | Control de inventario de dispositivos hospitalarios. | `services/devices-service` |
+| **`locations-service`** | Gestión de sedes, pisos y salas del hospital. | `services/locations-service` |
+| **`metrics-service`** | Procesamiento de datos y estadísticas en tiempo real. | `services/metrics-service` |
+| **`alerts-service`** | Sistema de notificaciones y gestión de estados críticos. | `services/alerts-service` |
+| **`db`** | Base de datos centralizada PostgreSQL 15. | Docker Image |
 
 ---
 

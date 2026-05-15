@@ -19,7 +19,7 @@ services:
       retries: 10
 
   auth-service:
-    build: ./authService
+    build: ./services/auth-service
     container_name: auth-service
     ports:
       - "5001:5001"
@@ -28,7 +28,7 @@ services:
         condition: service_healthy
 
   users-service:
-    build: ./usersService
+    build: ./services/users-service
     container_name: users-service
     ports:
       - "5002:5002"
@@ -37,7 +37,7 @@ services:
         condition: service_healthy
 
   devices-service:
-    build: ./devicesService
+    build: ./services/devices-service
     container_name: devices-service
     ports:
       - "5003:5003"
@@ -46,7 +46,7 @@ services:
         condition: service_healthy
 
   locations-service:
-    build: ./locationsService
+    build: ./services/locations-service
     container_name: locations-service
     ports:
       - "5004:5004"
@@ -55,7 +55,7 @@ services:
         condition: service_healthy
 
   metrics-service:
-    build: ./metricsService
+    build: ./services/metrics-service
     container_name: metrics-service
     ports:
       - "5005:5005"
@@ -64,7 +64,7 @@ services:
         condition: service_healthy
 
   alerts-service:
-    build: ./alertsService
+    build: ./services/alerts-service
     container_name: alerts-service
     ports:
       - "5006:5006"
@@ -73,7 +73,7 @@ services:
         condition: service_healthy
 
   gateway:
-    build: ./gateway
+    build: ./apps/gateway
     container_name: gateway
     ports:
       - "5000:5000"
@@ -86,7 +86,7 @@ services:
       - alerts-service
 
   frontend:
-    build: ./frontend
+    build: ./apps/frontend
     container_name: husrt-frontend
     ports:
       - "3000:3000"
